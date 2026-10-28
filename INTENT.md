@@ -134,8 +134,18 @@ a token refresh without manual re-auth.
   deletes, important given the whole integration rests on an undocumented
   private API where "is this really a delete or an API glitch" deserves
   real insurance.
-- Large file / chunked upload support and any practical file-size limits
-  imposed by the private API.
+- ~~Large file / chunked upload support~~ **Resolved**: no client-side
+  chunking/splitting — it would make large files unreadable as normal
+  files to other Apple devices (Mac/iPhone), defeating the goal of staying
+  interoperable with the real iCloud Drive ecosystem. The private web API
+  iSync depends on only supports single-shot uploads and empirically fails
+  (`400 Bad Request`) around ~10GB, well under Apple's documented 50GB
+  per-file cap. Instead: a **configurable max-file-size threshold**
+  (default ~10 GiB) is enforced client-side — files under it sync normally
+  with bounded exponential-backoff retry on transient errors; files over
+  it are **not attempted**, and are skipped with a clear, visible flag
+  (`isync status`, logs, optional notification) rather than retried
+  indefinitely against a known hard wall.
 - Rate limiting / throttling strategy to avoid tripping Apple's abuse
   detection or getting the account flagged.
 - Minimum Linux distro/kernel support matrix and packaging story (plain
