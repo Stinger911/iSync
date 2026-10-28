@@ -146,8 +146,17 @@ a token refresh without manual re-auth.
   it are **not attempted**, and are skipped with a clear, visible flag
   (`isync status`, logs, optional notification) rather than retried
   indefinitely against a known hard wall.
-- Rate limiting / throttling strategy to avoid tripping Apple's abuse
-  detection or getting the account flagged.
+- ~~Rate limiting / throttling strategy~~ **Resolved**: an **adaptive
+  pacer** (rclone-`iclouddrive`-style) — a baseline inter-request delay
+  that multiplies (e.g. ×2, capped) on any rate-limit signal (HTTP 429, or
+  the `400`/`503` patterns Apple's API is known to return under load) and
+  gradually decays back down after a run of successes. This mirrors a
+  proven approach already validated against this exact private API,
+  rather than guessing at static limits. Paired with a **bounded
+  concurrency cap** (default ~3 simultaneous transfers) as an independent
+  control, since parallel-connection bursts are a separate abuse signal
+  from request rate. Composes with the already-decided adaptive polling
+  interval — both tighten/back off together under load or idle.
 - Minimum Linux distro/kernel support matrix and packaging story (plain
   binary, .deb/.rpm, AUR, Nix?).
 - Testing strategy given there's no sandbox/mock for the real iCloud API —
