@@ -96,9 +96,16 @@ a token refresh without manual re-auth.
   `LoadCredential=`/environment set up by the user when starting the
   service; decrypted material lives only in process memory for the
   daemon's lifetime and is re-requested on 2FA/session expiry.
-- How to detect remote changes efficiently: polling the iCloud Drive API
-  on an interval (simplest, works with any account) vs. any push/webhook
-  mechanism Apple might expose (unlikely to exist for this API).
+- ~~Remote change detection~~ **Resolved**: hybrid detection. Local-side
+  changes are detected instantly via filesystem watch (`fsnotify`, inotify
+  under Linux) — no local polling needed. Remote-side (iCloud Drive) changes
+  are detected via **adaptive-interval polling**, since Apple's private API
+  exposes no public push/webhook mechanism: a baseline interval (default
+  ~60s) tightens to ~10–15s for a short window after any detected activity
+  (local or remote), and backs off to ~5–10 min when idle. This balances
+  responsiveness against Apple API load/rate-limit risk without the much
+  higher reverse-engineering cost of chasing Apple's undocumented internal
+  push/long-poll endpoints.
 - How file metadata (mtime, hashes) is mapped between iCloud Drive's
   item model and local filesystem semantics, and what hashing/change-
   detection strategy avoids re-uploading/downloading unchanged files.
