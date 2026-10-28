@@ -1,0 +1,15 @@
+# Build artifacts
+/bin/
+/dist/
+/isync
+/isyncd
+*.test
+*.out
+
+# Local dev/runtime state (never commit real credentials or sync state)
+*.age
+*.db
+config.toml
+
+# Go
+/vendor/
