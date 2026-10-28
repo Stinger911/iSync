@@ -106,9 +106,18 @@ a token refresh without manual re-auth.
   responsiveness against Apple API load/rate-limit risk without the much
   higher reverse-engineering cost of chasing Apple's undocumented internal
   push/long-poll endpoints.
-- How file metadata (mtime, hashes) is mapped between iCloud Drive's
-  item model and local filesystem semantics, and what hashing/change-
-  detection strategy avoids re-uploading/downloading unchanged files.
+- ~~Metadata mapping / change-detection strategy~~ **Resolved**: hybrid
+  size+mtime/hash comparison. Local size+mtime and iCloud's reported
+  size+modified-date act as a cheap first-pass filter to skip files that
+  are obviously unchanged; a content hash (SHA-256 locally, compared
+  against Apple's item etag/checksum where available) is computed only
+  when size or mtime differ, to avoid spurious transfers from clock skew
+  or no-op touches. This state — per-path local mtime/size/hash and
+  remote etag/modified-date — is persisted in an embedded **BoltDB
+  (`etcd-io/bbolt`)** key-value store as the sync engine's source of
+  truth for "already in sync", chosen over SQLite to keep the project
+  CGO-free (easier static cross-compilation, matching the Go/systemd
+  single-binary story).
 - Behavior for deletes: does a delete on one side propagate as a delete
   on the other, or is there a trash/safety net to avoid accidental data
   loss (strongly suggested given 2-way sync + LWW conflict policy)?
