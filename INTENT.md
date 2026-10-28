@@ -157,8 +157,16 @@ a token refresh without manual re-auth.
   control, since parallel-connection bursts are a separate abuse signal
   from request rate. Composes with the already-decided adaptive polling
   interval — both tighten/back off together under load or idle.
-- Minimum Linux distro/kernel support matrix and packaging story (plain
-  binary, .deb/.rpm, AUR, Nix?).
+- ~~Distro support & packaging story~~ **Resolved**: static Go binary
+  (CGO-free, per existing constraints) for amd64/arm64 distributed via
+  GitHub Releases plus `go install` support, a provided systemd user-unit
+  template, and a small install script/`make install` target. No
+  distro-specific packages (.deb/.rpm/AUR/Nix) for v1 — disproportionate
+  maintenance burden for a solo, no-deadline, exploratory project;
+  revisit if/when outside users or contributors ask for it. No hard
+  minimum kernel/distro version — a static, CGO-free Go binary runs on
+  essentially any modern Linux; the only real requirement is `systemd`
+  present for daemon mode.
 - Testing strategy given there's no sandbox/mock for the real iCloud API —
   will need a fake API server for CI and manual testing against a real
   (possibly throwaway) Apple ID.
