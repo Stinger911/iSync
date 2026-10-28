@@ -85,9 +85,17 @@ a token refresh without manual re-auth.
 
 ## Open questions
 
-- Exact encrypted-credential-file format/KDF (age? NaCl secretbox? custom)
-  and how the master password is supplied (prompt each start vs. cached
-  in memory vs. systemd `LoadCredential`/env for the daemon).
+- ~~Credential-file crypto~~ **Resolved**: credentials (Apple ID, session
+  cookie, trust token) are serialized (JSON) and encrypted as a single blob
+  using `age` (`filippo.io/age`) with a passphrase-derived (`scrypt`)
+  recipient — chosen over hand-rolled NaCl/AES schemes to avoid owning a
+  custom file format/nonce handling, in favor of a reviewed, versioned,
+  widely-deployed format. Stored at `~/.config/isync/credentials.age`,
+  mode `0600`. The CLI (`isync login`) writes/rotates it interactively.
+  The daemon, having no TTY, receives the master password via systemd
+  `LoadCredential=`/environment set up by the user when starting the
+  service; decrypted material lives only in process memory for the
+  daemon's lifetime and is re-requested on 2FA/session expiry.
 - How to detect remote changes efficiently: polling the iCloud Drive API
   on an interval (simplest, works with any account) vs. any push/webhook
   mechanism Apple might expose (unlikely to exist for this API).
