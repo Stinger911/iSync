@@ -72,17 +72,19 @@ a token refresh without manual re-auth.
   blast radius, API load, and local disk usage.
 - Must survive interactive 2FA at login and handle session/trust-token
   expiry by prompting for re-auth rather than silently failing forever.
-- Open source project (public GitHub repo), so code, auth flow, and
-  storage format must be sane for third parties to read, audit, and trust
-  with their Apple credentials — no telemetry, no secrets leaving the
-  local machine.
+- Open source project (public GitHub repo) under the **Apache License 2.0**
+  — chosen over MIT for its explicit patent grant/retaliation clause and
+  clean contribution provenance (relevant given the reverse-engineered API
+  and an eventual expectation of outside contributors). Code, auth flow,
+  and storage format must be sane for third parties to read, audit, and
+  trust with their Apple credentials — no telemetry, no secrets leaving
+  the local machine.
 - No fixed deadline; this is an exploratory/learning project, so
   correctness and a clean, learnable codebase matter more than speed of
   delivery.
 
 ## Open questions
 
-- License choice (MIT / Apache-2.0 / GPL) not yet decided.
 - Exact encrypted-credential-file format/KDF (age? NaCl secretbox? custom)
   and how the master password is supplied (prompt each start vs. cached
   in memory vs. systemd `LoadCredential`/env for the daemon).
@@ -104,8 +106,9 @@ a token refresh without manual re-auth.
 - Testing strategy given there's no sandbox/mock for the real iCloud API —
   will need a fake API server for CI and manual testing against a real
   (possibly throwaway) Apple ID.
-- Config format (YAML/TOML) and module path (`github.com/Stinger911/iSync`
-  assumed, to confirm once license/visibility is finalized).
+- Module path (`github.com/Stinger911/iSync` assumed, to confirm once
+  development starts).
+- Config format for folder pairs and daemon settings (YAML vs TOML).
 
 ## Author & status
 
