@@ -167,9 +167,19 @@ a token refresh without manual re-auth.
   minimum kernel/distro version — a static, CGO-free Go binary runs on
   essentially any modern Linux; the only real requirement is `systemd`
   present for daemon mode.
-- Testing strategy given there's no sandbox/mock for the real iCloud API —
-  will need a fake API server for CI and manual testing against a real
-  (possibly throwaway) Apple ID.
+- ~~Testing strategy~~ **Resolved**: a hand-built fake API server
+  implementing the subset of Apple's private endpoints iSync uses (auth,
+  listing, upload, download, delete — informed by rclone/pyicloud as
+  reference implementations) backs all automated unit/integration tests
+  and CI, with the real API client isolated behind an interface so tests
+  never touch real Apple infrastructure, and error conditions (429s,
+  400s, session expiry, 2FA challenges) can be simulated on demand.
+  This is paired with an occasional **manual pre-release smoke test**
+  against a real throwaway Apple ID to catch real-world API drift the
+  fake server can't. Record/replay (VCR-style) fixtures were considered
+  and rejected — the fixture-sanitization risk of capturing real account
+  traffic isn't worth the marginal fidelity gain over a well-built fake
+  server for a solo project.
 - Module path (`github.com/Stinger911/iSync` assumed, to confirm once
   development starts).
 - Config format for folder pairs and daemon settings (YAML vs TOML).
