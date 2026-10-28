@@ -180,11 +180,18 @@ a token refresh without manual re-auth.
   and rejected — the fixture-sanitization risk of capturing real account
   traffic isn't worth the marginal fidelity gain over a well-built fake
   server for a solo project.
-- Module path (`github.com/Stinger911/iSync` assumed, to confirm once
-  development starts).
-- Config format for folder pairs and daemon settings (YAML vs TOML).
+- ~~Module path~~ **Resolved**: `github.com/Stinger911/iSync`, matching
+  the GitHub repository.
+- ~~Config format~~ **Resolved**: **TOML** for folder pairs and daemon
+  settings — idiomatic for the Go CLI ecosystem (used by `rclone`, `hugo`,
+  etc.), less whitespace-sensitive than YAML, and a good fit for iSync's
+  config shape (a list of folder pairs + flat daemon settings, not deeply
+  nested data).
+
+All open questions from the original intent are now resolved; the next
+artifact chain step is `spec.md` (requirements + design).
 
 ## Author & status
 
 - Author: Stinger911 (originator & reviewer)
-- Status: **draft** — pending review before moving to `spec.md`
+- Status: **validated** — all open questions resolved, ready for `spec.md`
