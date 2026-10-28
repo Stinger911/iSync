@@ -118,9 +118,22 @@ a token refresh without manual re-auth.
   truth for "already in sync", chosen over SQLite to keep the project
   CGO-free (easier static cross-compilation, matching the Go/systemd
   single-binary story).
-- Behavior for deletes: does a delete on one side propagate as a delete
-  on the other, or is there a trash/safety net to avoid accidental data
-  loss (strongly suggested given 2-way sync + LWW conflict policy)?
+- ~~Delete propagation / safety net~~ **Resolved**: deletes propagate
+  (matches 2-way sync expectations), but every delete isync performs —
+  regardless of which side triggered it — moves the file into a **local
+  trash/quarantine** at `~/.local/share/isync/trash/<YYYY-MM-DDTHH-MM>/...`
+  instead of unlinking it, with a configurable retention period (default
+  ~30 days) and periodic cleanup. The trash directory is keyed to the
+  **minute** of the delete; if a second delete lands in the same minute
+  and would collide on path, the colliding entry's filename gets the
+  **full timestamp (down to the second/sub-second) appended** to stay
+  unique. This local trash is combined with, not a replacement for,
+  **iCloud's own built-in "Recently Deleted" retention** on the remote
+  side — giving one consistent safety net for local→remote deletes plus
+  Apple's existing mechanism as a second line of defense for remote-side
+  deletes, important given the whole integration rests on an undocumented
+  private API where "is this really a delete or an API glitch" deserves
+  real insurance.
 - Large file / chunked upload support and any practical file-size limits
   imposed by the private API.
 - Rate limiting / throttling strategy to avoid tripping Apple's abuse
