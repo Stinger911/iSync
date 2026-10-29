@@ -35,6 +35,8 @@ type Pair struct {
 	ID         string `toml:"id"`
 	ICloudPath string `toml:"icloud_path"`
 	LocalPath  string `toml:"local_path"`
+	Enabled    bool   `toml:"enabled"`
+	RemotePath string `toml:"remote_path"`
 }
 
 // Config is the root TOML document shape.
@@ -55,6 +57,48 @@ func DefaultPath() (string, error) {
 		base = filepath.Join(home, ".config")
 	}
 	return filepath.Join(base, "isync", "config.toml"), nil
+}
+
+// CredentialPath returns the encrypted credential file path,
+// ~/.config/isync/credentials.age.
+func CredentialPath() (string, error) {
+	base := os.Getenv("XDG_CONFIG_HOME")
+	if base == "" {
+		home, err := os.UserHomeDir()
+		if err != nil {
+			return "", fmt.Errorf("config: resolving home directory: %w", err)
+		}
+		base = filepath.Join(home, ".config")
+	}
+	return filepath.Join(base, "isync", "credentials.age"), nil
+}
+
+// StatePath returns the BoltDB state database path,
+// ~/.local/share/isync/state.db.
+func StatePath() (string, error) {
+	base := os.Getenv("XDG_DATA_HOME")
+	if base == "" {
+		home, err := os.UserHomeDir()
+		if err != nil {
+			return "", fmt.Errorf("config: resolving home directory: %w", err)
+		}
+		base = filepath.Join(home, ".local", "share")
+	}
+	return filepath.Join(base, "isync", "state.db"), nil
+}
+
+// TrashPath returns the quarantine root directory,
+// ~/.local/share/isync/trash.
+func TrashPath() (string, error) {
+	base := os.Getenv("XDG_DATA_HOME")
+	if base == "" {
+		home, err := os.UserHomeDir()
+		if err != nil {
+			return "", fmt.Errorf("config: resolving home directory: %w", err)
+		}
+		base = filepath.Join(home, ".local", "share")
+	}
+	return filepath.Join(base, "isync", "trash"), nil
 }
 
 // Default returns a Config populated with all documented defaults and no
