@@ -1,0 +1,23 @@
+[Unit]
+Description=iSync — iCloud Drive folder sync daemon
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/isyncd
+Restart=on-failure
+RestartSec=10
+
+# Load the master passphrase from a systemd credential.
+LoadCredential=master-passphrase:%h/.config/isync/master-passphrase
+
+# Hardening: minimal privileges for a user service that only touches
+# configurable iSync paths under the user's home directory.
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=%h/.config/isync %h/.local/share/isync %h/.local/state/isync %t/isync
+
+[Install]
+WantedBy=default.target

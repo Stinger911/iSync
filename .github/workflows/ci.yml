@@ -26,6 +26,15 @@ jobs:
       - name: Build
         run: go build ./...
 
+      - name: Build release binaries
+        run: |
+          CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /tmp/isync ./cmd/isync
+          CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /tmp/isyncd ./cmd/isyncd
+
+      - name: Check install script syntax
+        if: matrix.goarch == 'amd64'
+        run: bash -n scripts/install.sh
+
       - name: Vet
         run: go vet ./...
 
